@@ -1,5 +1,8 @@
 from sqlalchemy import Column, String, Integer
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import DateTime, Boolean
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -10,10 +13,16 @@ Grouped into batches called Blocks.
 """
 class Party(Base):
     __tablename__ = "parties"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    party_size = Column(Integer) # number of people in the party
 
+    phone = Column(String, primary_key=True)  # E.164 format, e.g., "+1234567890"
+    name = Column(String)
+    size = Column(Integer)
+    priority = Column(Integer, default=0)
+    block_id = Column(Integer)  # Foreign key to Block
+
+    created_at = Column(DateTime, default=datetime.now())
+    last_login = Column(DateTime)
+    is_active = Column(Boolean, default=True)
 
 """
 Represents an organization that manages 
@@ -32,5 +41,9 @@ Is the building block for a queue.
 """
 class Block(Base):
     __tablename__ = "blocks"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+    id = Column(String, primary_key=True)
+    capacity = Column(Integer)  # max number of people in the block
+    status = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    service_provider_id = Column(Integer) # Foreign key to ServiceProvider
+    queue_code = Column(String)  # 6-digit alphanumeric code associated with the block's queue

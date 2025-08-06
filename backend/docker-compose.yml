@@ -1,7 +1,16 @@
 version: "3.8"
 services:
   backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/docs" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - .:/app
     env_file:
       - .env
     ports:
@@ -28,3 +37,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

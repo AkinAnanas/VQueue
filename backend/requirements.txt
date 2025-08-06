@@ -2,6 +2,11 @@ fastapi
 uvicorn
 redis
 redis[hiredis]
+pydantic-redis
 psycopg2-binary
 sqlalchemy
 python-dotenv
+phonenumbers
+pyjwt
+twilio
+bcrypt
