@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI
 from fastapi import Path, Depends, HTTPException
 from redis import Redis
@@ -16,10 +17,11 @@ from app.models import Party
 
 app = FastAPI()
 
-print("✅ FastAPI app loaded")
+logging.info("✅ FastAPI app loaded")
 
 @app.get("/")
 async def root():
+    logging.info("Root endpoint accessed")
     return Response(status_code=200, body={ "message": "Welcome to the Queue Management API" })
 
 """

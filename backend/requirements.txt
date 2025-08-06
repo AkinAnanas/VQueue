@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-redis
 redis[hiredis]
 pydantic-redis
 psycopg2-binary

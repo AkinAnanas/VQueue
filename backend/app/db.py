@@ -1,8 +1,15 @@
-import os
+import os, logging
 from redis import Redis
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+logging.basicConfig(
+    level=logging.DEBUG,  # Or INFO for less verbosity
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -17,20 +24,25 @@ engine = create_engine(pg_conn_string, echo=True)
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
+"""Dependency to get Postgres DB session"""
 def get_db():
     db = SessionLocal()
     try:
+        logging.info("Connected to PostgreSQL")
         yield db
     except Exception as e:
-        print(f"DB session error: {e}")
+        logging.error(f"DB session error: {e}")
     finally:
         db.close()
 
+"""Dependency to get Redis client"""
 def get_redis():
+    rdb = Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'), db=0, decode_responses=True)
     try:
-        rdb = Redis(host="localhost", port=6379, decode_responses=True)
+        logging.info("Connected to Redis")
+        yield rdb
     except Exception as e:
-        print(f"Redis connection error: {e}")
+        logging.error(f"Redis connection error: {e}")
         rdb = None
     finally:
-        yield rdb
+        rdb.close()
