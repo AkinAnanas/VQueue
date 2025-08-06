@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
@@ -13,7 +14,11 @@ redis_conn_string = \
 
 engine = create_engine(pg_conn_string, echo=True)
 
-connection = engine.connect()
-print("Connected to PostgreSQL successfully!")
-# ... perform operations ...
-connection.close()
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

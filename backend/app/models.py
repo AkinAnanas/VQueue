@@ -23,7 +23,7 @@ class ServiceProvider(Base):
     __tablename__ = "service_providers"
     id = Column(Integer, primary_key=True)
     name = Column(String)
-
+    queue_codes = Column(ARRAY(String))  # List of queue codes
 
 """
 Represents a batch of parties waiting to use the service 

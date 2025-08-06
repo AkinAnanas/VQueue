@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
-class FormatResponse(BaseModel):
+class Response(BaseModel):
     status_code: int
-    body: str
+    body: dict
 
 class JoinQueueRequest(BaseModel):
     name: str
@@ -16,3 +16,6 @@ class JoinQueueResponse(BaseModel):
 class QueueStatusResponse(BaseModel):
     status_code: int
     body: dict  # e.g. {"block_count": 3, "estimated_wait": "10 min"}
+
+class EmptyResponse(BaseModel):
+    status_code: int # 204
