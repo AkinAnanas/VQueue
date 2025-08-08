@@ -30,8 +30,9 @@ def get_db():
     try:
         logging.info("Connected to PostgreSQL")
         yield db
-    except Exception as e:
+    except BaseException as e:
         logging.error(f"DB session error: {e}")
+        raise e
     finally:
         db.close()
 
@@ -41,8 +42,6 @@ def get_redis():
     try:
         logging.info("Connected to Redis")
         yield rdb
-    except Exception as e:
+    except BaseException as e:
         logging.error(f"Redis connection error: {e}")
-        rdb = None
-    finally:
-        rdb.close()
+        raise e

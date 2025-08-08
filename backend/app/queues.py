@@ -1,24 +1,9 @@
 import uuid
+from typing import Optional
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic_redis import Model
-
-class PartyInfo(BaseModel):
-    party_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
-    party_size: int = 1
-    priority: int = 0  # e.g. 0 = normal, 1 = VIP
-
-    def to_dict(self):
-        return self.model_dump()
-
-    @classmethod
-    def from_dict(cls, data: dict):
-        return cls(**data)
-    
-class PartyInfoRedis(Model):
-    __model__ = PartyInfo
-    __key_prefix__ = "party"
+from app.identities import PartyInfo
     
 class BlockInfo(BaseModel):
     block_id: str
@@ -38,12 +23,15 @@ class BlockInfoRedis(Model):
 
 class QueueInfo(BaseModel):
     code: str  # 6-digit alphanumeric code
-    service_provider_id: int
-    is_open: bool = True
-    capacity: int = 100  # max number of people in the queue
-    size: int = 0  # current number of people in the queue
-    wait_time_estimate: str = "0 min"  # e.g. "15 min"
-    manual_dispatch: bool = False  # if True, blocks are dispatched manually
+    service_provider_id: Optional[int] = None
+    is_open: Optional[bool] = True
+    capacity: Optional[int] = 100  # max number of people per block per queue
+    size: Optional[int] = 0  # current number of people in the queue
+    wait_time_estimate: Optional[str] = "0 min"  # e.g. "15 min"
+    manual_dispatch: Optional[bool] = False  # if True, blocks are dispatched manually
+    name: Optional[str] = None  # Name of the queue
+    description: Optional[str] = None  # Description of the queue
+    image_url: Optional[str] = None  # URL to an image representing the queue
 
     def to_dict(self):
         return self.model_dump()

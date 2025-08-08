@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 redis[hiredis]
+pydantic[email]
 pydantic-redis
 psycopg2-binary
 sqlalchemy
@@ -9,3 +10,4 @@ phonenumbers
 pyjwt
 twilio
 bcrypt
+alembic

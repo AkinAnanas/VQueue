@@ -1,8 +1,9 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import DateTime, Boolean
-from datetime import datetime
+from sqlalchemy.orm import relationship
+from datetime import datetime, timezone
 
 Base = declarative_base()
 
@@ -18,11 +19,11 @@ class Party(Base):
     name = Column(String)
     size = Column(Integer)
     priority = Column(Integer, default=0)
-    block_id = Column(Integer)  # Foreign key to Block
+    block_id = Column(String, ForeignKey("blocks.id"))  # queue:{code}:block_id
+    block = relationship("Block", back_populates="parties")
 
-    created_at = Column(DateTime, default=datetime.now())
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
     last_login = Column(DateTime)
-    is_active = Column(Boolean, default=True)
 
 """
 Represents an organization that manages 
@@ -31,8 +32,20 @@ virtual queues and blocks.
 class ServiceProvider(Base):
     __tablename__ = "service_providers"
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    queue_codes = Column(ARRAY(String))  # List of queue codes
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    location = Column(String, nullable=True)
+    queue_codes = Column(ARRAY(String), nullable=False)  # List of queue codes
+    blocks = relationship("Block", back_populates="service_provider")
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if self.queue_codes is None:
+            self.queue_codes = []
+
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    last_login = Column(DateTime)
 
 """
 Represents a batch of parties waiting to use the service 
@@ -44,6 +57,9 @@ class Block(Base):
     id = Column(String, primary_key=True)
     capacity = Column(Integer)  # max number of people in the block
     status = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    service_provider_id = Column(Integer) # Foreign key to ServiceProvider
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    dispatched_at = Column(DateTime)
+    service_provider_id = Column(Integer, ForeignKey("service_providers.id"))
+    service_provider = relationship("ServiceProvider", back_populates="blocks")
+    parties = relationship("Party", back_populates="block")
     queue_code = Column(String)  # 6-digit alphanumeric code associated with the block's queue

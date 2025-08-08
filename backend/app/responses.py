@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from app.queue_models import PartyInfo
+from app.queues import PartyInfo
 from typing import List, Optional
 
 class Response(BaseModel):
