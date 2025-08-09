@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from app.queues import PartyInfo
 from typing import List, Optional
 

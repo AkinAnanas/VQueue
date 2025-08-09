@@ -1,5 +1,5 @@
 import logging
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.auth.manager import generate_otp, store_otp, get_otp, verify_otp, delete_otp
 from app.auth.manager import send_sms, create_jwt, get_token, verify_password, hash_password
 from app.utils import normalize_phone, normalize_email, validate_email
@@ -9,7 +9,7 @@ from fastapi.security import HTTPBearer
 from app.db import get_db, get_redis
 from app.models import Party, ServiceProvider
 from app.responses import Response
-from app.identities import PartyInfo, ServiceProviderInfo
+from app.identities import PartyInfo, ServiceProviderInfo, LoginRequest
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
@@ -66,20 +66,16 @@ def logout(token: str = Depends(get_token), rdb: Redis = Depends(get_redis)):
     return Response(status_code=200, body={"message": "Logged out successfully"})
 
 @router.post("/provider/login")
-def provider_login(payload: ServiceProviderInfo, db: Session = Depends(get_db)):
-    try:
-        email = payload.email
-        db_provider = db.query(ServiceProvider).filter(ServiceProvider.email == email).first()
-        if not db_provider:
-            return Response(status_code=404, body={"error": "Email not registered"})
-        if not verify_password(payload.password, db_provider.hashed_password):
-            return Response(status_code=401, body={"error": "Invalid password"})
-        token = create_jwt(str(db_provider.id))
-        db_provider.last_login = datetime.now(timezone.utc)
-        db.commit()
-        return Response(status_code=200, body={"access_token": token})
-    except Exception as e:
-        return Response(status_code=500, body={"error": str(e)})
+def provider_login(payload: LoginRequest, db: Session = Depends(get_db)):
+    db_provider = db.query(ServiceProvider).filter(ServiceProvider.email == payload.email).first()
+    if not db_provider:
+        return HTTPException(status_code=404, detail="Email not registered")
+    if not verify_password(payload.password, db_provider.hashed_password):
+        return HTTPException(status_code=401, detail="Invalid password")
+    token = create_jwt(str(db_provider.id))
+    db_provider.last_login = datetime.now(timezone.utc)
+    db.commit()
+    return Response(status_code=200, body={"access_token": token})
 
 @router.post("/provider/register")
 def provider_register(payload: ServiceProviderInfo, db: Session = Depends(get_db)):

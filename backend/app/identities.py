@@ -34,3 +34,7 @@ class ServiceProviderInfo(BaseModel):
     @classmethod
     def from_dict(cls, data: dict):
         return cls(**data)
+    
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str

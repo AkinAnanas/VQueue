@@ -1,6 +1,7 @@
 import logging
 from fastapi import FastAPI
 from fastapi import Path, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from redis import Redis
 from sqlalchemy.orm import Session
 from app.responses import Response, JoinQueueResponse, QueueStatusResponse
@@ -24,6 +25,15 @@ from app.admin.routes import router as admin_router
 app = FastAPI()
 
 logging.info("✅ FastAPI app loaded")
+
+# Add this before including routers
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or specify a list of allowed origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth_router)
 app.include_router(user_router)
