@@ -10,7 +10,7 @@ from app.identities import PartyInfo, ServiceProviderInfo
 from app.utils import generate_code
 import app.queue_manager as queue_manager
 from app.auth.manager import generate_otp, store_otp, get_otp, verify_otp, delete_otp
-from app.auth.manager import send_sms, create_jwt, get_token
+from app.auth.manager import send_sms, create_tokens, get_token
 from app.models import ServiceProvider, Party
 from datetime import timedelta, datetime
 

@@ -37,9 +37,17 @@ def initialize_queue(rdb: Redis, queue_info: QueueInfo):
     blocks_key = f"blocks:{queue_info.code}"
     rdb.delete(blocks_key)
 
-    # Set the queue variables
+    # Store the queue data that will be used by the blocks for initialization
+    # Capacity and ServiceProviderId CANNOT be changed after initialization
     block_counter_key = f"queue:{queue_info.code}:block_counter"
     rdb.set(block_counter_key, 0)
     block_capacity_key = f"queue:{queue_info.code}:block_capacity"
-    rdb.set(block_capacity_key, queue_info.block_capacity)
+    rdb.set(block_capacity_key, queue_info.capacity)
+    service_provider_id_key = f"queue:{queue_info.code}:service_provider_id"
+    rdb.set(service_provider_id_key, queue_info.service_provider_id)
+    
+    # Set the rest of the queue data as json
+    queue_key = f"queue:{queue_info.code}"
+    rdb.delete(queue_key)
+    rdb.rpush(queue_key, json.dumps(queue_info))
     return {"status": "initialized"}

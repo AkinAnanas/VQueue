@@ -1,5 +1,6 @@
 import phonenumbers
 import logging
+import secrets
 import bcrypt
 import jwt
 import os
@@ -42,15 +43,18 @@ def send_sms(phone: str, otp: str):
     print(f"Sending OTP {otp} to phone {phone}")
 
 # ID can be phone number or service provider ID
-def create_jwt(id: str) -> str:
+def create_tokens(id: str, rdb: Redis) -> str:
     expiration = datetime.now(timezone.utc) + timedelta(minutes=JWT_EXPIRATION_MINUTES)
     payload = {
         "sub": id,
         "exp": expiration,
         "iat": datetime.now(timezone.utc)
     }
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    return token
+    access_token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    refresh_token = secrets.token_urlsafe(32)
+    rdb.setex(f"refresh:{refresh_token}", timedelta(days=7), id)
+    rdb.setex(f"refresh_by_id:{id}", timedelta(days=7), refresh_token)
+    return [access_token, refresh_token]
 
 def verify_jwt(rdb: Redis, token: str) -> dict:
     # Check if token is blacklisted
@@ -86,12 +90,10 @@ def get_token(
 
 def parse_token(token: str) -> dict:
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM], options={"verify_exp": False})
         return payload
-    except jwt.ExpiredSignatureError:
-        raise ValueError("Token expired")
     except jwt.InvalidTokenError:
-        raise ValueError("Invalid token")
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 
 def hash_password(password: str) -> str:

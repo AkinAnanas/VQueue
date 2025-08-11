@@ -43,3 +43,18 @@ class QueueInfo(BaseModel):
 class QueueInfoRedis(Model):
     __model__ = QueueInfo
     __key_prefix__ = "queue"
+
+class QueueStatus(BaseModel):
+    size: int
+    wait_time_estimate: str
+    name: str
+    description: str
+    block_count: int
+    image_url: str
+
+    def to_dict(self):
+        return self.model_dump()
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(**data)
