@@ -2,7 +2,7 @@ import { Typography, Box, useTheme } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { IconButton } from "@mui/material";
 
-function CreateQueueButton() {
+function CreateQueueButton({ setOpen }: { setOpen: (open: boolean) => void }) {
   const theme = useTheme();
   return (
     <Box
@@ -20,6 +20,9 @@ function CreateQueueButton() {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
+      }}
+      onClick={() => {
+        setOpen(true);
       }}
     >
       <IconButton

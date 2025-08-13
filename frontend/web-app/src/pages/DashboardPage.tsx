@@ -3,7 +3,7 @@ import NavBar from "../components/NavBar";
 import { Box, Container } from "@mui/material";
 import QueuePanel from "../components/QueuePanel";
 import SideDrawer from "../components/SideDrawer";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 function DashboardPage() {
   useEffect(() => {

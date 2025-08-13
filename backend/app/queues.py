@@ -1,7 +1,6 @@
 import uuid
 from typing import Optional
 from pydantic import BaseModel
-from pydantic import Field
 from pydantic_redis import Model
 from app.identities import PartyInfo
     
@@ -22,10 +21,11 @@ class BlockInfoRedis(Model):
     __key_prefix__ = "block"
 
 class QueueInfo(BaseModel):
-    code: str  # 6-digit alphanumeric code
+    code: Optional[str] = None  # 6-digit alphanumeric code
     service_provider_id: Optional[int] = None
     is_open: Optional[bool] = True
-    capacity: Optional[int] = 100  # max number of people per block per queue
+    max_block_capacity: Optional[int] = 100  # max number of people per block per queue, -1 for single file
+    max_party_capacity: Optional[int] = 10 # max number of people per party per queue
     size: Optional[int] = 0  # current number of people in the queue
     wait_time_estimate: Optional[str] = "0 min"  # e.g. "15 min"
     manual_dispatch: Optional[bool] = False  # if True, blocks are dispatched manually

@@ -4,8 +4,6 @@ import InputBase from "@mui/material/InputBase";
 import { Button, Box, AppBar, Toolbar, Typography } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import MenuIcon from "@mui/icons-material/Menu";
-import { useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const Search = styled("div")(({ theme }) => ({
@@ -61,7 +59,7 @@ function NavBar() {
           variant="h6"
           noWrap
           component="div"
-          sx={{ display: { xs: "none", sm: "block" } }}
+          sx={{ display: { xs: "none", sm: "block", flexGrow: 1 } }}
         >
           VQueue
         </Typography>
@@ -74,13 +72,16 @@ function NavBar() {
             inputProps={{ "aria-label": "search" }}
           />
         </Search>
-        <Box sx={{ display: { xs: "none", sm: "block", flexGrow: 1 } }}>
+        <Box
+          sx={{
+            display: { xs: "none", sm: "block", flexGrow: 1 },
+          }}
+        >
           <IconButton
             size="large"
             edge="start"
             color="inherit"
             aria-label="open profile"
-            sx={{ mr: 2 }}
           >
             <AccountCircle />
           </IconButton>

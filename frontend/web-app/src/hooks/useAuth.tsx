@@ -22,6 +22,7 @@ interface AuthContextType {
   login: (credentials: Credentials) => any;
   logout: () => void;
   register: (user: UserDetails) => void;
+  refresh: () => any;
   error: string | null;
   loading: boolean;
 }
@@ -33,6 +34,7 @@ export const AuthContext = createContext<AuthContextType>({
   login: (_: Credentials) => [null, null],
   logout: () => {},
   register: (_: UserDetails) => {},
+  refresh: async () => [null, null],
   error: null,
   loading: false,
 });
@@ -169,6 +171,47 @@ export function AuthProvider({ children }: { children: JSX.Element[] }) {
     }
   }
 
+  async function refresh() {
+    setLoading(true);
+    setError(null);
+
+    const token = localStorage.getItem("refresh_token");
+
+    try {
+      const response = await fetch(`${baseUrl}/auth/refresh`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh_token: token }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Token refresh failed");
+      }
+
+      const new_access_token = data?.body?.access_token;
+      const new_refresh_token = data?.body?.refresh_token;
+
+      if (!new_access_token || !new_refresh_token) {
+        throw new Error("Missing access or refresh token in response");
+      }
+
+      localStorage.setItem("access_token", new_access_token);
+      localStorage.setItem("refresh_token", new_refresh_token);
+      setAccessToken(new_access_token);
+      setRefreshToken(new_refresh_token);
+      return [new_access_token, new_refresh_token];
+    } catch (err: any) {
+      setError(err.message || "Unknown error");
+      logout();
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     if (accessToken) {
       const { exp } = jwtDecode(accessToken);
@@ -183,6 +226,7 @@ export function AuthProvider({ children }: { children: JSX.Element[] }) {
         login,
         logout,
         register,
+        refresh,
         accessToken,
         refreshToken,
         isAuthenticated,

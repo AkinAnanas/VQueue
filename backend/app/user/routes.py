@@ -60,22 +60,26 @@ async def create_queue(
     rdb: Redis = Depends(get_redis),
     db: Session = Depends(get_db)
 ):
-    # Generate 6-digit alpha-numeric code associated with queue
-    while rdb.exists(f"queue:{code}"):
-        code = generate_code()
-    
-    # Initialize the queue in Redis
-    queue_manager.initialize_queue(rdb, payload)
-
-    # Update service provider's list of queues
-    service_provider_id = parse_token(token)["sub"]
+    # Get the service provider
+    service_provider_id = int(parse_token(token)["sub"])
     service_provider = db.get(ServiceProvider, service_provider_id)
     if service_provider is None:
         raise HTTPException(status_code=404, detail="Service provider not found")
-    service_provider.queues.append(code)
+    
+    # Generate 6-digit alpha-numeric code associated with queue
+    payload.code = generate_code()
+    while rdb.exists(f"queue:{payload.code}"):
+        payload.code = generate_code()
+        
+    # Initialize the queue in Redis
+    payload.service_provider_id = service_provider_id
+    queue_manager.initialize_queue(rdb, payload)
+
+    # Add the queue code to the service provider's list of queues
+    service_provider.queue_codes.append(payload.code)
     db.commit()
 
-    return Response(status_code=200, body={"queue_code": code})
+    return Response(status_code=200, body={"queue_code": payload.code})
 
 @router.get("/queue/{code}", response_model=QueueInfoResponse)
 async def get_queue(
@@ -109,7 +113,7 @@ async def get_queues(
     db: Session = Depends(get_db)
 ):
     token_data = parse_token(token)
-    service_provider_id = token_data["sub"]
+    service_provider_id = int(token_data["sub"])
 
     # Get the service provider queues
     sp = db.get(ServiceProvider, service_provider_id)

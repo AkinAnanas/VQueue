@@ -1,7 +1,7 @@
 import uuid
 import json
 from redis import Redis
-from app.queues import PartyInfo, BlockInfo, QueueInfo
+from app.queues import PartyInfo, BlockInfo, QueueInfo, QueueInfoRedis
 
 def add_party_to_block(rdb: Redis, code: str, party: PartyInfo):
     blocks_key = f"blocks:{code}"
@@ -42,12 +42,12 @@ def initialize_queue(rdb: Redis, queue_info: QueueInfo):
     block_counter_key = f"queue:{queue_info.code}:block_counter"
     rdb.set(block_counter_key, 0)
     block_capacity_key = f"queue:{queue_info.code}:block_capacity"
-    rdb.set(block_capacity_key, queue_info.capacity)
+    rdb.set(block_capacity_key, queue_info.max_block_capacity)
     service_provider_id_key = f"queue:{queue_info.code}:service_provider_id"
     rdb.set(service_provider_id_key, queue_info.service_provider_id)
     
     # Set the rest of the queue data as json
     queue_key = f"queue:{queue_info.code}"
     rdb.delete(queue_key)
-    rdb.rpush(queue_key, json.dumps(queue_info))
+    rdb.rpush(queue_key, json.dumps(queue_info.to_dict()))
     return {"status": "initialized"}
