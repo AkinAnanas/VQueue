@@ -2,7 +2,7 @@ import { Container, Paper, TextField, useTheme, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import PasswordField from "../components/PasswordField";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const { login, error, loading } = useAuth();

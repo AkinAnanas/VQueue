@@ -29,7 +29,7 @@ def add_party_to_block(rdb: Redis, code: str, party: PartyInfo):
     new_block_capacity_key = f"queue:{code}:block_capacity"
     block_capacity = int(rdb.get(new_block_capacity_key) or 10)
     new_block = BlockInfo(block_id=new_block_id, parties=[party.to_dict()], capacity=block_capacity)
-    rdb.rpush(blocks_key, json.dumps(new_block))
+    rdb.rpush(blocks_key, json.dumps(new_block.to_dict()))
     return {"party_id": party.party_id, "block_id": new_block_id}
 
 def initialize_queue(rdb: Redis, queue_info: QueueInfo):

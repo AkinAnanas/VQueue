@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy import DateTime, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
@@ -36,7 +37,7 @@ class ServiceProvider(Base):
     email = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     location = Column(String, nullable=True)
-    queue_codes = Column(ARRAY(String), nullable=False)  # List of queue codes
+    queue_codes = Column(MutableList.as_mutable(ARRAY(String)), nullable=False)  # List of queue codes
     blocks = relationship("Block", back_populates="service_provider")
 
     def __init__(self, **kwargs):

@@ -75,7 +75,7 @@ export function QueueProvider({ children }: { children: JSX.Element }) {
         params.append("search", search);
       }
 
-      const response = await fetch(`${baseUrl}/queues?${params.toString()}`, {
+      const response = await fetch(`${baseUrl}/queues/?${params.toString()}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -87,8 +87,9 @@ export function QueueProvider({ children }: { children: JSX.Element }) {
         throw new Error("Failed to fetch queues");
       }
 
+      console.log(response);
       const data = await response.json();
-      return data as QueueInfo[];
+      return data.body as QueueInfo[];
     } catch (err: any) {
       setError(err.message || "Unknown error");
       return [];

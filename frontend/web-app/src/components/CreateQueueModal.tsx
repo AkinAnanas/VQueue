@@ -76,7 +76,6 @@ function CreateQueueModal({
       }}
       open={open}
       onClose={() => {
-        navigate(0);
         setOpen(false);
       }}
     >

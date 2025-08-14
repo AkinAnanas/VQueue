@@ -15,19 +15,21 @@ function QueuePanel() {
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  if (!accessToken) {
-    if (!refresh()[0]) {
-      navigate("/login");
-    }
-    return <div>Loading...</div>;
+  if (!accessToken && !refresh()[0]) {
+    navigate("/login");
   }
 
   useEffect(() => {
-    fetchQueues({ limit: 10, offset: 0, token: accessToken!! }).then((data) => {
-      console.log(data);
-      setQueues(data);
-    });
+    fetchQueues({ limit: 10, offset: 0, token: accessToken!! }).then(setQueues);
   }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div color="red">Error: {error}</div>;
+  }
 
   return (
     <QueueProvider>
