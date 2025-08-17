@@ -26,7 +26,7 @@ function CreateQueueModal({
   const [manualDispatch, setManualDispatch] = useState(true);
   const [queueOpen, setQueueOpen] = useState(true);
   const [name, setName] = useState("");
-  const { createQueue, loading, error } = useQueues();
+  const { createQueue, fetchQueues, loading, error } = useQueues();
   const { accessToken, refresh } = useAuth();
   const navigate = useNavigate();
 

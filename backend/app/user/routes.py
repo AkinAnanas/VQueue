@@ -215,7 +215,7 @@ async def delete_queue(
     sp = db.get(ServiceProvider, id)
     if not sp:
         raise HTTPException(status_code=404, detail="Service provider not found")
-    sp.queues.remove(code)
+    sp.queue_codes.remove(code)
     # Delete the queue and all associated data
     pipe = rdb.pipeline()
     pipe.delete(f"queue:{code}:service_provider_id")

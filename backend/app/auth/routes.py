@@ -129,4 +129,5 @@ def provider_logout(token: str = Depends(get_token), rdb: Redis = Depends(get_re
     if refresh_token:
         rdb.delete(f"refresh:{refresh_token}")
         rdb.delete(f"refresh_by_id:{id}")
+    else: raise HTTPException(status_code=400, detail="No active session found, id={id}")
     return Response(status_code=200, body={"message": "Service provider logged out successfully"})

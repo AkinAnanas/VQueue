@@ -52,14 +52,22 @@ function NavBar() {
   return (
     <AppBar
       position="static"
-      sx={{ position: "absolute", top: 0, right: 0, width: "80%" }}
+      sx={{ position: "absolute", top: 0, right: 0, width: "80%", height: 64 }}
     >
       <Toolbar>
         <Typography
           variant="h6"
           noWrap
           component="div"
-          sx={{ display: { xs: "none", sm: "block", flexGrow: 1 } }}
+          sx={{
+            display: {
+              xs: "none",
+              sm: "block",
+              cursor: "pointer",
+              flexGrow: 1,
+            },
+          }}
+          onClick={() => navigate("/")}
         >
           VQueue
         </Typography>

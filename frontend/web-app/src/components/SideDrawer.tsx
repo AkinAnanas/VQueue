@@ -16,7 +16,10 @@ function SideDrawer(width: any) {
       variant="permanent"
       sx={{
         display: { xs: "none", sm: "block" },
-        "& .MuiDrawer-paper": { boxSizing: "border-box", width: width },
+        "& .MuiDrawer-paper": {
+          boxSizing: "border-box",
+          width: width,
+        },
       }}
     >
       <Accordion sx={{ padding: "8px" }}>

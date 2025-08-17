@@ -27,7 +27,9 @@ interface SearchParams {
 interface QueueContextType {
   loading: boolean;
   error: string | null;
-  fetchQueues: (params: SearchParams) => Promise<QueueInfo[]>;
+  fetchQueues: (
+    params: SearchParams
+  ) => Promise<{ total: number; queues: QueueInfo[] }>;
   getQueue: (params: {
     code: string;
     token: string;
@@ -39,7 +41,7 @@ export const QueueContext = createContext<QueueContextType>({
   loading: false,
   error: null,
   fetchQueues: async (_: SearchParams) => {
-    return [];
+    return { total: 0, queues: [] };
   },
   getQueue: async (_: { code: string; token: string }) => {
     return null;
@@ -75,6 +77,8 @@ export function QueueProvider({ children }: { children: JSX.Element }) {
         params.append("search", search);
       }
 
+      console.log(`${baseUrl}/queues/?${params.toString()}`);
+
       const response = await fetch(`${baseUrl}/queues/?${params.toString()}`, {
         method: "GET",
         headers: {
@@ -89,10 +93,10 @@ export function QueueProvider({ children }: { children: JSX.Element }) {
 
       console.log(response);
       const data = await response.json();
-      return data.body as QueueInfo[];
+      return { total: data.total, queues: data.body as QueueInfo[] };
     } catch (err: any) {
       setError(err.message || "Unknown error");
-      return [];
+      return { total: 0, queues: [] };
     } finally {
       setLoading(false);
     }
@@ -109,7 +113,7 @@ export function QueueProvider({ children }: { children: JSX.Element }) {
     setError(null);
 
     try {
-      const response = await fetch(`${baseUrl}/queues/${code}`, {
+      const response = await fetch(`${baseUrl}/queue/${code}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

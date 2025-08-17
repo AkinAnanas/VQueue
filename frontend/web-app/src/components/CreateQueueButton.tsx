@@ -7,8 +7,8 @@ function CreateQueueButton({ setOpen }: { setOpen: (open: boolean) => void }) {
   return (
     <Box
       sx={{
-        width: 240,
-        height: 240,
+        width: 220,
+        height: 260,
         outlineColor: theme.palette.divider,
         backgroundColor: theme.palette.grey[100],
         "&:hover": {

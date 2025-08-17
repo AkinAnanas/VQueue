@@ -12,15 +12,14 @@ function QueueCard(props: QueueInfo) {
   return (
     <Card
       sx={{
-        width: 240,
-        height: 240,
+        width: 220,
+        height: 260,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
       }}
     >
       <CardContent>
-        <img src={props.image_url} alt="" />
         <Typography>{props.code}</Typography>
         <Typography>{props.name}</Typography>
         <Typography>{props.wait_time_estimate}</Typography>

@@ -1,9 +1,9 @@
-import { Pagination } from "@mui/material";
 import NavBar from "../components/NavBar";
 import { Box, Container } from "@mui/material";
 import QueuePanel from "../components/QueuePanel";
 import SideDrawer from "../components/SideDrawer";
 import { useEffect } from "react";
+import { QueueProvider } from "../hooks/useQueues";
 
 function DashboardPage() {
   useEffect(() => {
@@ -30,9 +30,10 @@ function DashboardPage() {
       >
         <NavBar />
         <Container maxWidth="xl" sx={{ flexGrow: 1, py: 4 }}>
-          <QueuePanel />
+          <QueueProvider>
+            <QueuePanel />
+          </QueueProvider>
         </Container>
-        <Pagination count={10} disabled />
       </Box>
     </Box>
   );
